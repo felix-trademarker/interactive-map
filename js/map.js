@@ -1,5 +1,3 @@
-const sea = "#fff";
-const dark = "#888";
 const land = "#ccc";
 const blue = "#448";
 const green = "#484";
@@ -160,8 +158,10 @@ class MapViewer {
       if (this.readyState == 4 && this.status == 200) {
         map.loaded ++;
         if (this.responseText) {
-          let json = JSON.parse(this.responseText);
-          map.loadCollection(json, name, json.features.length > 1);
+          try {
+            let json = JSON.parse(this.responseText);
+            map.loadCollection(json, name, json.features.length > 1);
+          } catch (e) {}
         }
       }
     };
@@ -223,7 +223,8 @@ class MapViewer {
           v.ISO = k;
           v.iso = k.toLowerCase();
           v.NAME = v.name.toUpperCase();
-          v.url = v.name.replaceAll(/\s/g, '-');
+          v.url = "trademark-registration-"+v.name.replaceAll(/\s/g, '-').toLowerCase();
+          //v.url = v.name.replaceAll(/\s/g, '-');
           // path to top
           let path = [];
           let d = v;
@@ -468,16 +469,14 @@ class MapViewer {
   
   updateURL() {
     let title = "Trademark Registration Worldwide";
-    let url = "./";
+    //let url = "./";
     let targ = this.selected;
     if (targ && this.data[targ]) {
       let d = this.data[targ];
       title = `Trademark Registration in ${d.name}`;
-      url = d.url;
+      //url = d.url;
     }
-    //let map = this;
-    //window.history.replaceState({ "selected": targ }, title, url);
-    window.history.pushState({ "selected":targ }, title, url);
+    //window.history.pushState({ "selected":targ }, title, url);
     document.title = title;
   }
   
@@ -544,7 +543,8 @@ class MapViewer {
     let d = this.data[id2];
     if (!d) return;
     if (!this.getFeatureById(id2, "medium"))
-      this.fetchMap(`./fetch.php?c=${id2}`, "medium", false);
+      this.fetchMap(`geo/${id2}.geo.json`, "medium", false);
+      //this.fetchMap(`./fetch.php?c=${id2}`, "medium", false);
     
     this.selected = id2;
     let path = d.path;
@@ -1031,7 +1031,7 @@ class MapViewer {
       if (this.tselected && this.time - this.tselected > 10)
         if (!this.anim || this.anim.done)
           if (!medium || !medium.overwrite)
-            this.fetchMap("js/medium.geo.json", "medium", true);
+            this.fetchMap("geo/medium.geo.json", "medium", true);
   }
   
   draw() {
